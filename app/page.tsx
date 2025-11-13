@@ -42,69 +42,64 @@ export default function Home() {
     }, []);
 
     return (
-        <div
-            className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-            <main
-                className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-                <div className="space-y-6 w-full">
-                    <h1 className="text-3xl font-semibold tracking-tight">Library</h1>
-                    <p className="text-sm text-muted-foreground">Browse all
-                        available books.</p>
 
-                    {error && (
-                        <Alert variant="destructive">
-                            <AlertTitle>Unable to load</AlertTitle>
-                            <AlertDescription>{error}</AlertDescription>
-                        </Alert>
-                    )}
+        <div className="space-y-6 w-full">
+            <h1 className="text-3xl font-semibold tracking-tight">Library</h1>
+            <p className="text-sm text-muted-foreground">Browse all
+                available books.</p>
 
-                    {loading ? (
-                        <div
-                            className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                            {Array.from({length: 8}).map((_, i) => (
-                                <div key={i} className="space-y-2">
-                                    <Skeleton
-                                        className="h-40 w-full rounded-md"/>
-                                    <Skeleton className="h-4 w-3/4"/>
-                                    <Skeleton className="h-4 w-1/2"/>
-                                </div>
-                            ))}
+            {error && (
+                <Alert variant="destructive">
+                    <AlertTitle>Unable to load</AlertTitle>
+                    <AlertDescription>{error}</AlertDescription>
+                </Alert>
+            )}
+
+            {loading ? (
+                <div
+                    className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    {Array.from({length: 8}).map((_, i) => (
+                        <div key={i} className="space-y-2">
+                            <Skeleton
+                                className="h-40 w-full rounded-md"/>
+                            <Skeleton className="h-4 w-3/4"/>
+                            <Skeleton className="h-4 w-1/2"/>
                         </div>
-                    ) : (
+                    ))}
+                </div>
+            ) : (
+                <div
+                    className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    {books.map((book) => (
+                        <Card key={book.id}
+                              className="overflow-hidden flex flex-col">
+                            <div
+                                className="relative h-40 w-full bg-gradient-to-br from-blue-50 to-blue-100">
+                                <Image
+                                    src="/window.svg" // placeholder image
+                                    alt={book.name}
+                                    fill
+                                    className="object-contain p-4"
+                                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                />
+                            </div>
+                            <CardHeader className="py-3">
+                                <CardTitle
+                                    className="text-base line-clamp-2">{book.name}</CardTitle>
+                            </CardHeader>
+                            <CardContent
+                                className="pt-0 pb-4 text-sm text-muted-foreground">
+                                <p className="line-clamp-1">{book.author?.name || "Unknown Author"}</p>
+                            </CardContent>
+                        </Card>
+                    ))}
+                    {!books.length && !error && (
                         <div
-                            className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                            {books.map((book) => (
-                                <Card key={book.id}
-                                      className="overflow-hidden flex flex-col">
-                                    <div
-                                        className="relative h-40 w-full bg-gradient-to-br from-blue-50 to-blue-100">
-                                        <Image
-                                            src="/window.svg" // placeholder image
-                                            alt={book.name}
-                                            fill
-                                            className="object-contain p-4"
-                                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                                        />
-                                    </div>
-                                    <CardHeader className="py-3">
-                                        <CardTitle
-                                            className="text-base line-clamp-2">{book.name}</CardTitle>
-                                    </CardHeader>
-                                    <CardContent
-                                        className="pt-0 pb-4 text-sm text-muted-foreground">
-                                        <p className="line-clamp-1">{book.author?.name || "Unknown Author"}</p>
-                                    </CardContent>
-                                </Card>
-                            ))}
-                            {!books.length && !error && (
-                                <div
-                                    className="col-span-full text-sm text-muted-foreground">No
-                                    books found.</div>
-                            )}
-                        </div>
+                            className="col-span-full text-sm text-muted-foreground">No
+                            books found.</div>
                     )}
                 </div>
-            </main>
+            )}
         </div>
     );
 }
