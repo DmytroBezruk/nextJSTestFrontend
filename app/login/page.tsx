@@ -52,7 +52,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-black px-4">
+    <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-black px-4 w-full">
       {/* Card container */}
       <Card className="w-full max-w-sm border border-zinc-200 dark:border-zinc-800 shadow-sm">
         <CardHeader>
