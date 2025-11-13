@@ -104,10 +104,39 @@ api.interceptors.response.use(
       }
     }
 
-    // Otherwise, propagate the error
-    return Promise.reject(error);
+    // Otherwise, propagate the error with DRF-friendly message
+    const extractDRFMessage = (data: unknown): string => {
+      if (!data || typeof data !== 'object') return '';
+      if ('non_field_errors' in data && Array.isArray((data as any).non_field_errors)) {
+        return (data as any).non_field_errors.join(' ');
+      }
+      const fieldMessages = Object.entries(data as Record<string, unknown>)
+        .map(([key, value]) => {
+          if (Array.isArray(value)) return value.join(' ');
+          if (typeof value === 'string') return value;
+          return '';
+        })
+        .filter(Boolean)
+        .join(' ');
+      if (fieldMessages) return fieldMessages;
+      if ('detail' in data && typeof (data as any).detail === 'string') return (data as any).detail;
+      return '';
+    };
+
+    if (error.response) {
+      const { status, data } = error.response;
+      const message = extractDRFMessage(data) || error.message || 'Request failed.';
+      return Promise.reject(new ApiClientError(message, { status, data, cause: error }));
+    }
+
+    if (error.request) {
+      return Promise.reject(new ApiClientError('No response received from server.', { cause: error }));
+    }
+
+    return Promise.reject(new ApiClientError(error.message || 'Unexpected error.', { cause: error }));
   }
 );
+
 
 
 export type HttpMethod = 'get' | 'post' | 'put' | 'patch' | 'delete';

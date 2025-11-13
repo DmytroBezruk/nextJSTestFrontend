@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { apiClient } from '@/lib/apiClient';
+import { login } from '@/lib/auth';
 import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
@@ -17,33 +17,11 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      const data = await apiClient.post<{ access: string; refresh: string }>(
-        '/api/login/',
-        { email, password }
-      );
-      localStorage.setItem('access', data.access);
-      localStorage.setItem('refresh', data.refresh);
-
-      router.push('/dashboard');
+      await login(email, password); // use centralized helper
+      router.push('/');
     } catch (err: any) {
-      let message = 'Login failed.';
-
-      console.log(err);
-
-      if (err?.response?.data) {
-        // DRF usually sends {"non_field_errors": ["..."]}
-        if (Array.isArray(err.response.data.non_field_errors)) {
-          message = err.response.data.non_field_errors.join(' ');
-        } else if (typeof err.response.data.detail === 'string') {
-          message = err.response.data.detail;
-        }
-      } else if (err?.message) {
-        message = err.message;
-      }
-
-      setError(message);
-    }
-    finally {
+      setError(err?.message || 'Login failed.');
+    } finally {
       setLoading(false);
     }
   };

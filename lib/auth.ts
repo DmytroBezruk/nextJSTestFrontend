@@ -5,8 +5,8 @@ export interface TokenPair {
   refresh: string;
 }
 
-export async function login(username: string, password: string): Promise<TokenPair> {
-  const data = await apiClient.post<TokenPair>('/auth/login/', { username, password });
+export async function login(email: string, password: string): Promise<TokenPair> {
+  const data = await apiClient.post<TokenPair>('/api/login/', { email, password });
   // Save tokens — for simplicity, use localStorage (you can replace with cookies)
   localStorage.setItem('access', data.access);
   localStorage.setItem('refresh', data.refresh);
