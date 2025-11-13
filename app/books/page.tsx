@@ -59,7 +59,7 @@ export default function BooksPage() {
         </Alert>
       )}
       {loading ? (
-        <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 8 }).map((_, i: number) => (
             <div key={i} className="space-y-2">
               <Skeleton className="h-40 w-full rounded-md" />
@@ -69,7 +69,7 @@ export default function BooksPage() {
           ))}
         </div>
       ) : (
-        <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {books.map((book: Book) => (
             <Link key={book.id} href={`/books/${book.id}`} className="group">
               <Card className="overflow-hidden flex flex-col transition-shadow group-hover:shadow-sm">
