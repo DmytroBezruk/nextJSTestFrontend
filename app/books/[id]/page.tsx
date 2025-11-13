@@ -7,6 +7,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 // @ts-ignore
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 // @ts-ignore
 import { Button } from "@/components/ui/button";
 // @ts-ignore
@@ -163,7 +164,7 @@ export default function BookDetailPage() {
                   <FormItem>
                     <FormLabel>Content</FormLabel>
                     <FormControl>
-                      <Input placeholder="Short description" {...field} />
+                      <Textarea placeholder="Short description" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

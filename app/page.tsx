@@ -1,105 +1,224 @@
 "use client";
 
-// Shadcn UI imports to be generated via npx shadcn add commands
-// @ts-ignore -- will exist after `npx shadcn add card`
-import {Card, CardHeader, CardTitle, CardContent} from "@/components/ui/card";
-// @ts-ignore -- will exist after `npx shadcn add alert`
-import {Alert, AlertTitle, AlertDescription} from "@/components/ui/alert";
-// @ts-ignore -- will exist after `npx shadcn add skeleton`
-import {Skeleton} from "@/components/ui/skeleton";
+// Shadcn UI placeholders (run these: npx shadcn add card alert skeleton)
+// @ts-ignore
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+// @ts-ignore
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+// @ts-ignore
+import { Skeleton } from "@/components/ui/skeleton";
 
-import Image from "next/image";
-import {useEffect, useState} from "react";
-import {fetchBooks} from "@/lib/data";
-import {Book} from "@/lib/types";
+import { useEffect, useState, useMemo } from "react";
+import { fetchBooks, fetchAuthors } from "@/lib/data";
+import { Book, Author } from "@/lib/types";
 
-export default function Home() {
-    const [books, setBooks] = useState<Book[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+interface MonthBucket { label: string; books: number; authors: number; }
 
-    useEffect(() => {
-        let active = true;
+export default function DashboardPage() {
+  const [books, setBooks] = useState<Book[]>([]);
+  const [authors, setAuthors] = useState<Author[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-        async function load() {
-            try {
-                setLoading(true);
-                const data = await fetchBooks();
-                if (!active) return;
-                setBooks(data);
-            } catch (err: any) {
-                if (!active) return;
-                setError(err?.message || "Failed to load books.");
-            } finally {
-                if (active) setLoading(false);
-            }
-        }
+  useEffect(() => {
+    let active = true;
+    async function load() {
+      try {
+        setLoading(true);
+        const [booksData, authorsData] = await Promise.all([fetchBooks(), fetchAuthors()]);
+        if (!active) return;
+        setBooks(booksData);
+        setAuthors(authorsData);
+      } catch (err: unknown) {
+        if (!active) return;
+        const message = err instanceof Error ? err.message : 'Failed to load dashboard data.';
+        setError(message);
+      } finally {
+        if (active) setLoading(false);
+      }
+    }
+    load();
+    return () => { active = false; };
+  }, []);
 
-        load();
-        return () => {
-            active = false;
-        };
-    }, []);
+  // Stats calculations
+  const stats = useMemo(() => {
+    const now = new Date();
+    const msInDay = 24 * 60 * 60 * 1000;
+    const daysAgo = (d: number) => new Date(now.getTime() - d * msInDay);
+    const last30 = daysAgo(30);
+    const prev30Start = daysAgo(60);
 
-    return (
+    const safeParseDate = (iso: string) => {
+      const d = new Date(iso);
+      return isNaN(d.getTime()) ? null : d;
+    };
 
-        <div className="space-y-6 w-full">
-            <h1 className="text-3xl font-semibold tracking-tight">Library</h1>
-            <p className="text-sm text-muted-foreground">Browse all
-                available books.</p>
+    const newBooksLast30 = books.filter(b => {
+      const d = safeParseDate(b.created_at);
+      return d && d >= last30;
+    }).length;
+    const newBooksPrev30 = books.filter(b => {
+      const d = safeParseDate(b.created_at);
+      return d && d >= prev30Start && d < last30;
+    }).length;
 
-            {error && (
-                <Alert variant="destructive">
-                    <AlertTitle>Unable to load</AlertTitle>
-                    <AlertDescription>{error}</AlertDescription>
-                </Alert>
-            )}
+    const newAuthorsLast30 = authors.filter(a => {
+      const d = safeParseDate(a.created_at);
+      return d && d >= last30;
+    }).length;
+    const newAuthorsPrev30 = authors.filter(a => {
+      const d = safeParseDate(a.created_at);
+      return d && d >= prev30Start && d < last30;
+    }).length;
 
-            {loading ? (
-                <div
-                    className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                    {Array.from({length: 8}).map((_, i) => (
-                        <div key={i} className="space-y-2">
-                            <Skeleton
-                                className="h-40 w-full rounded-md"/>
-                            <Skeleton className="h-4 w-3/4"/>
-                            <Skeleton className="h-4 w-1/2"/>
-                        </div>
-                    ))}
-                </div>
-            ) : (
-                <div
-                    className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                    {books.map((book) => (
-                        <Card key={book.id}
-                              className="overflow-hidden flex flex-col">
-                            <div
-                                className="relative h-40 w-full bg-gradient-to-br from-blue-50 to-blue-100">
-                                <Image
-                                    src="/window.svg" // placeholder image
-                                    alt={book.name}
-                                    fill
-                                    className="object-contain p-4"
-                                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                                />
-                            </div>
-                            <CardHeader className="py-3">
-                                <CardTitle
-                                    className="text-base line-clamp-2">{book.name}</CardTitle>
-                            </CardHeader>
-                            <CardContent
-                                className="pt-0 pb-4 text-sm text-muted-foreground">
-                                <p className="line-clamp-1">{book.author?.name || "Unknown Author"}</p>
-                            </CardContent>
-                        </Card>
-                    ))}
-                    {!books.length && !error && (
-                        <div
-                            className="col-span-full text-sm text-muted-foreground">No
-                            books found.</div>
-                    )}
-                </div>
-            )}
+    const pctChange = (current: number, prev: number) => {
+      if (prev === 0) return current === 0 ? 0 : 100;
+      return ((current - prev) / prev) * 100;
+    };
+
+    // Build last 6 month buckets (including current month)
+    const monthFormatter = new Intl.DateTimeFormat('en', { month: 'short' });
+    const buckets: MonthBucket[] = [];
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const label = monthFormatter.format(d);
+      const booksCount = books.filter(b => {
+        const bd = safeParseDate(b.created_at);
+        return bd && bd.getMonth() === d.getMonth() && bd.getFullYear() === d.getFullYear();
+      }).length;
+      const authorsCount = authors.filter(a => {
+        const ad = safeParseDate(a.created_at);
+        return ad && ad.getMonth() === d.getMonth() && ad.getFullYear() === d.getFullYear();
+      }).length;
+      buckets.push({ label, books: booksCount, authors: authorsCount });
+    }
+
+    return {
+      totalBooks: books.length,
+      totalAuthors: authors.length,
+      newBooksLast30,
+      newAuthorsLast30,
+      booksGrowthPct: pctChange(newBooksLast30, newBooksPrev30),
+      authorsGrowthPct: pctChange(newAuthorsLast30, newAuthorsPrev30),
+      buckets,
+    };
+  }, [books, authors]);
+
+  const maxBooks = Math.max(1, ...stats.buckets.map(b => b.books));
+  const maxAuthors = Math.max(1, ...stats.buckets.map(b => b.authors));
+
+  return (
+    <div className="space-y-8" role="main">
+      <div className="space-y-1">
+        <h1 className="text-3xl font-semibold tracking-tight">Dashboard</h1>
+        <p className="text-sm text-muted-foreground">Overview of your catalog performance.</p>
+      </div>
+
+      {error && (
+        <Alert variant="destructive">
+          <AlertTitle>Data Load Error</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
+      {loading ? (
+        <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-32 w-full rounded-md" />
+          ))}
+          <div className="col-span-full grid gap-6 grid-cols-1 lg:grid-cols-2">
+            <Skeleton className="h-72 w-full rounded-md" />
+            <Skeleton className="h-72 w-full rounded-md" />
+          </div>
         </div>
-    );
+      ) : (
+        <>
+          {/* Summary Cards */}
+          <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium">Total Books</CardTitle>
+                <CardDescription className="text-3xl font-semibold tracking-tight">{stats.totalBooks}</CardDescription>
+              </CardHeader>
+              <CardContent className="text-xs text-muted-foreground">All books currently in the system.</CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium">Total Authors</CardTitle>
+                <CardDescription className="text-3xl font-semibold tracking-tight">{stats.totalAuthors}</CardDescription>
+              </CardHeader>
+              <CardContent className="text-xs text-muted-foreground">Unique authors represented.</CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium">Books (Last 30d)</CardTitle>
+                <CardDescription className="flex items-baseline gap-2">
+                  <span className="text-3xl font-semibold tracking-tight">{stats.newBooksLast30}</span>
+                  <span className={`text-xs font-medium rounded px-1.5 py-0.5 ${stats.booksGrowthPct >= 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{stats.booksGrowthPct >= 0 ? '+' : ''}{stats.booksGrowthPct.toFixed(0)}%</span>
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="text-xs text-muted-foreground">Compared to previous 30 days.</CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium">Authors (Last 30d)</CardTitle>
+                <CardDescription className="flex items-baseline gap-2">
+                  <span className="text-3xl font-semibold tracking-tight">{stats.newAuthorsLast30}</span>
+                  <span className={`text-xs font-medium rounded px-1.5 py-0.5 ${stats.authorsGrowthPct >= 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{stats.authorsGrowthPct >= 0 ? '+' : ''}{stats.authorsGrowthPct.toFixed(0)}%</span>
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="text-xs text-muted-foreground">Compared to previous 30 days.</CardContent>
+            </Card>
+          </div>
+
+          {/* Charts */}
+          <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
+            <Card className={'justify-between'}>
+              <CardHeader>
+                <CardTitle>Books per Month</CardTitle>
+                <CardDescription>Last 6 months of book creation volume.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-end gap-3 h-48 w-full">
+                  {stats.buckets.map(b => (
+                    <div key={b.label} className="flex flex-col items-center justify-end h-full flex-1">
+                      <div
+                        className="w-full rounded-t bg-blue-500 transition-all"
+                        style={{ height: `${(b.books / maxBooks) * 100}%` }}
+                        aria-label={`Books in ${b.label}: ${b.books}`}
+                      />
+                      <span className="mt-1 text-[10px] text-muted-foreground font-medium">{b.label}</span>
+                      <span className="text-[11px] font-semibold mt-0.5">{b.books}</span>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+            <Card className={'justify-between'}>
+              <CardHeader>
+                <CardTitle>Authors per Month</CardTitle>
+                <CardDescription>Last 6 months of author creation volume.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-end gap-3 h-48 w-full">
+                  {stats.buckets.map(b => (
+                    <div key={b.label} className="flex flex-col items-center justify-end h-full flex-1">
+                      <div
+                        className="w-full rounded-t bg-indigo-500 transition-all"
+                        style={{ height: `${(b.authors / maxAuthors) * 100}%` }}
+                        aria-label={`Authors in ${b.label}: ${b.authors}`}
+                      />
+                      <span className="mt-1 text-[10px] text-muted-foreground font-medium">{b.label}</span>
+                      <span className="text-[11px] font-semibold mt-0.5">{b.authors}</span>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </>
+      )}
+    </div>
+  );
 }
