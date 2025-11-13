@@ -31,6 +31,11 @@ export function Navbar() {
               Logout
             </Button>
           )}
+          {!hideActions && !isAuthed && (
+          <Button asChild variant="outline" size="sm">
+          <Link href="/login">Login</Link>
+          </Button>
+          )}
         </div>
       </div>
     </nav>
