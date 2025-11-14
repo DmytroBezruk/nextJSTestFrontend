@@ -41,6 +41,8 @@ export default function AuthorsPage() {
     return () => { active = false; };
   }, [page]);
 
+  const pageSize = authors.length || 0;
+
   return (
     <div className="space-y-6 w-full">
       <div className="flex items-center justify-between flex-wrap gap-4">
@@ -94,10 +96,12 @@ export default function AuthorsPage() {
       )}
       <SlidingPagination
         page={page}
-        hasNext={!!pager?.next}
+        totalCount={pager?.count}
+        pageSize={pageSize}
         loading={loading}
         onChange={setPage}
         windowSize={5}
+        className="justify-center"
       />
     </div>
   );
