@@ -1,11 +1,8 @@
 "use client";
 
 // Shadcn UI placeholders (run these: npx shadcn add card alert skeleton)
-// @ts-expect-error generated later via shadcn add card
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-// @ts-expect-error generated later via shadcn add alert
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-// @ts-expect-error generated later via shadcn add skeleton
 import { Skeleton } from "@/components/ui/skeleton";
 
 import { useEffect, useState } from "react";
