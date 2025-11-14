@@ -19,7 +19,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createBook, fetchAuthors } from "@/lib/data";
+import { createBook, fetchAllAuthors } from "@/lib/data";
 import { Author } from "@/lib/types";
 
 const BookSchema = z.object({
@@ -48,7 +48,7 @@ export default function NewBookPage() {
     async function loadAuthors() {
       try {
         setAuthorsLoading(true);
-        const data = await fetchAuthors();
+        const data = await fetchAllAuthors();
         if (!active) return;
         setAuthors(data);
       } catch (err: unknown) {

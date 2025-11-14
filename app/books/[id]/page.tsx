@@ -19,7 +19,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { fetchBook, updateBook, deleteBook, fetchAuthors } from "@/lib/data";
+import { fetchBook, updateBook, deleteBook, fetchAllAuthors } from "@/lib/data";
 import { Book, Author } from "@/lib/types";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -58,7 +58,7 @@ export default function BookDetailPage() {
       try {
         setLoading(true);
         const data = await fetchBook(id);
-        const authorsData = await fetchAuthors();
+        const authorsData = await fetchAllAuthors();
         if (!active) return;
         setBook(data);
         setAuthors(authorsData);

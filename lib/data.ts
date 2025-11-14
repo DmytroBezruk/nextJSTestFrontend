@@ -12,6 +12,7 @@ import {
 } from './types';
 
 // Authors
+export const fetchAllAuthors = () => apiClient.get<Author[]>('/api/authors/all/');
 export const fetchAuthors = (page?: number) => apiClient.get<PaginatedAuthorList>(`/api/authors/${page ? `?page=${page}` : ''}`);
 export const fetchAuthor = (id: number) => apiClient.get<Author>(`/api/authors/${id}/`);
 export const createAuthor = (payload: CreateAuthorPayload) =>
