@@ -7,10 +7,12 @@ import {
   UpdateAuthorPayload,
   UpdateBookPayload,
   AnalyticsSummary,
+  PaginatedAuthorList,
+  PaginatedBookList,
 } from './types';
 
 // Authors
-export const fetchAuthors = () => apiClient.get<Author[]>('/api/authors/');
+export const fetchAuthors = (page?: number) => apiClient.get<PaginatedAuthorList>(`/api/authors/${page ? `?page=${page}` : ''}`);
 export const fetchAuthor = (id: number) => apiClient.get<Author>(`/api/authors/${id}/`);
 export const createAuthor = (payload: CreateAuthorPayload) =>
   apiClient.post<Author, CreateAuthorPayload>('/api/authors/', payload);
@@ -19,7 +21,7 @@ export const updateAuthor = (id: number, payload: UpdateAuthorPayload) =>
 export const deleteAuthor = (id: number) => apiClient.delete<null>(`/api/authors/${id}/`);
 
 // Books
-export const fetchBooks = () => apiClient.get<Book[]>('/api/books/');
+export const fetchBooks = (page?: number) => apiClient.get<PaginatedBookList>(`/api/books/${page ? `?page=${page}` : ''}`);
 export const fetchBook = (id: number) => apiClient.get<Book>(`/api/books/${id}/`);
 export const createBook = (payload: CreateBookPayload) =>
   apiClient.post<Book, CreateBookPayload>('/api/books/', payload);

@@ -1,34 +1,34 @@
 "use client";
 
-// Shadcn UI placeholders (run: npx shadcn add card alert skeleton button)
-// @ts-ignore
+// Shadcn UI imports
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-// @ts-ignore
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-// @ts-ignore
 import { Skeleton } from "@/components/ui/skeleton";
-// @ts-ignore
 import { Button } from "@/components/ui/button";
+import { SlidingPagination } from "@/components/sliding-pagination";
 
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { fetchBooks } from "@/lib/data";
-import { Book } from "@/lib/types";
+import { Book, PaginatedBookList } from "@/lib/types";
 
 export default function BooksPage() {
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState<number>(1);
+  const [pager, setPager] = useState<PaginatedBookList | null>(null);
 
   useEffect(() => {
     let active = true;
     async function load(): Promise<void> {
       try {
         setLoading(true);
-        const data: Book[] = await fetchBooks();
+        const data = await fetchBooks(page);
         if (!active) return;
-        setBooks(data);
+        setBooks(data.results);
+        setPager(data);
       } catch (err: unknown) {
         if (!active) return;
         const message = err instanceof Error ? err.message : 'Failed to load books.';
@@ -39,7 +39,7 @@ export default function BooksPage() {
     }
     load();
     return () => { active = false; };
-  }, []);
+  }, [page]);
 
   return (
     <div className="space-y-6 w-full">
@@ -96,7 +96,13 @@ export default function BooksPage() {
           )}
         </div>
       )}
+      <SlidingPagination
+        page={page}
+        hasNext={!!pager?.next}
+        loading={loading}
+        onChange={setPage}
+        windowSize={5}
+      />
     </div>
   );
 }
-

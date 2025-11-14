@@ -53,3 +53,17 @@ export interface AnalyticsSummary {
   authorsGrowthPct: number;
   buckets: AnalyticsBucket[];
 }
+
+export interface PaginatedAuthorList {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: Author[];
+}
+
+export interface PaginatedBookList {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: Book[];
+}

@@ -1,34 +1,34 @@
 "use client";
 
-// Shadcn UI imports (ensure you run: npx shadcn add card alert skeleton button)
-// @ts-ignore
+// Shadcn UI imports
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-// @ts-ignore
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-// @ts-ignore
 import { Skeleton } from "@/components/ui/skeleton";
-// @ts-ignore
 import { Button } from "@/components/ui/button";
+import { SlidingPagination } from "@/components/sliding-pagination";
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { fetchAuthors } from "@/lib/data";
-import { Author } from "@/lib/types";
+import { Author, PaginatedAuthorList } from "@/lib/types";
 import { User } from "lucide-react";
 
 export default function AuthorsPage() {
   const [authors, setAuthors] = useState<Author[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState<number>(1);
+  const [pager, setPager] = useState<PaginatedAuthorList | null>(null);
 
   useEffect(() => {
     let active: boolean = true;
     async function load(): Promise<void> {
       try {
         setLoading(true);
-        const data: Author[] = await fetchAuthors();
+        const data = await fetchAuthors(page);
         if (!active) return;
-        setAuthors(data);
+        setAuthors(data.results);
+        setPager(data);
       } catch (err: unknown) {
         if (!active) return;
         const message: string = err instanceof Error ? err.message : 'Failed to load authors.';
@@ -39,7 +39,7 @@ export default function AuthorsPage() {
     }
     load();
     return () => { active = false; };
-  }, []);
+  }, [page]);
 
   return (
     <div className="space-y-6 w-full">
@@ -92,6 +92,13 @@ export default function AuthorsPage() {
           )}
         </div>
       )}
+      <SlidingPagination
+        page={page}
+        hasNext={!!pager?.next}
+        loading={loading}
+        onChange={setPage}
+        windowSize={5}
+      />
     </div>
   );
 }

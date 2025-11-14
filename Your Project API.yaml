@@ -28,11 +28,11 @@ paths:
           description: Account activated successfully
         '400':
           description: Invalid activation link
-  /api/authors/:
+  /api/analytics/:
     get:
-      operationId: authors_list
+      operationId: analytics_list
       tags:
-      - authors
+      - analytics
       security:
       - jwtAuth: []
       responses:
@@ -42,7 +42,28 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Author'
+                  $ref: '#/components/schemas/Analytics'
+          description: ''
+  /api/authors/:
+    get:
+      operationId: authors_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - authors
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAuthorList'
           description: ''
     post:
       operationId: authors_create
@@ -172,6 +193,13 @@ paths:
   /api/books/:
     get:
       operationId: books_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
       tags:
       - books
       security:
@@ -181,9 +209,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Book'
+                $ref: '#/components/schemas/PaginatedBookList'
           description: ''
     post:
       operationId: books_create
@@ -545,6 +571,35 @@ paths:
           description: ''
 components:
   schemas:
+    Analytics:
+      type: object
+      properties:
+        totalBooks:
+          type: integer
+        totalAuthors:
+          type: integer
+        newBooksLast30:
+          type: integer
+        newAuthorsLast30:
+          type: integer
+        booksGrowthPct:
+          type: number
+          format: double
+        authorsGrowthPct:
+          type: number
+          format: double
+        buckets:
+          type: array
+          items:
+            $ref: '#/components/schemas/MonthBucket'
+      required:
+      - authorsGrowthPct
+      - booksGrowthPct
+      - buckets
+      - newAuthorsLast30
+      - newBooksLast30
+      - totalAuthors
+      - totalBooks
     Author:
       type: object
       properties:
@@ -612,6 +667,19 @@ components:
       required:
       - new_password
       - old_password
+    MonthBucket:
+      type: object
+      properties:
+        label:
+          type: string
+        books:
+          type: integer
+        authors:
+          type: integer
+      required:
+      - authors
+      - books
+      - label
     MyTokenObtainPair:
       type: object
       properties:
@@ -624,6 +692,52 @@ components:
       required:
       - email
       - password
+    PaginatedAuthorList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Author'
+    PaginatedBookList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Book'
     PatchedAuthor:
       type: object
       properties:
