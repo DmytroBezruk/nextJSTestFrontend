@@ -38,3 +38,18 @@ export interface UpdateAuthorPayload {
   details?: string;
 }
 
+export interface AnalyticsBucket {
+  label: string;
+  books: number;
+  authors: number;
+}
+
+export interface AnalyticsSummary {
+  totalBooks: number;
+  totalAuthors: number;
+  newBooksLast30: number;
+  newAuthorsLast30: number;
+  booksGrowthPct: number;
+  authorsGrowthPct: number;
+  buckets: AnalyticsBucket[];
+}

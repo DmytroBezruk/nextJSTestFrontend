@@ -6,6 +6,7 @@ import {
   CreateBookPayload,
   UpdateAuthorPayload,
   UpdateBookPayload,
+  AnalyticsSummary,
 } from './types';
 
 // Authors
@@ -26,3 +27,5 @@ export const updateBook = (id: number, payload: UpdateBookPayload) =>
   apiClient.put<Book, UpdateBookPayload>(`/api/books/${id}/`, payload);
 export const deleteBook = (id: number) => apiClient.delete<null>(`/api/books/${id}/`);
 
+// Analytics
+export const fetchAnalytics = () => apiClient.get<AnalyticsSummary>('/api/analytics/');
