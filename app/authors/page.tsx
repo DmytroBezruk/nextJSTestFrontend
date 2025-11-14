@@ -19,6 +19,7 @@ export default function AuthorsPage() {
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState<number>(1);
   const [pager, setPager] = useState<PaginatedAuthorList | null>(null);
+  const [pageSize, setPageSize] = useState<number | null>(null);
 
   useEffect(() => {
     let active: boolean = true;
@@ -29,6 +30,9 @@ export default function AuthorsPage() {
         if (!active) return;
         setAuthors(data.results);
         setPager(data);
+        if (page === 1 && pageSize === null && data.results.length > 0) {
+          setPageSize(data.results.length);
+        }
       } catch (err: unknown) {
         if (!active) return;
         const message: string = err instanceof Error ? err.message : 'Failed to load authors.';
@@ -39,9 +43,7 @@ export default function AuthorsPage() {
     }
     load();
     return () => { active = false; };
-  }, [page]);
-
-  const pageSize = authors.length || 0;
+  }, [page, pageSize]);
 
   return (
     <div className="space-y-6 w-full">
@@ -97,7 +99,7 @@ export default function AuthorsPage() {
       <SlidingPagination
         page={page}
         totalCount={pager?.count}
-        pageSize={pageSize}
+        pageSize={pageSize || authors.length || 0}
         loading={loading}
         onChange={setPage}
         windowSize={5}

@@ -19,6 +19,7 @@ export default function BooksPage() {
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState<number>(1);
   const [pager, setPager] = useState<PaginatedBookList | null>(null);
+  const [pageSize, setPageSize] = useState<number | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -29,6 +30,9 @@ export default function BooksPage() {
         if (!active) return;
         setBooks(data.results);
         setPager(data);
+        if (page === 1 && pageSize === null && data.results.length > 0) {
+          setPageSize(data.results.length);
+        }
       } catch (err: unknown) {
         if (!active) return;
         const message = err instanceof Error ? err.message : 'Failed to load books.';
@@ -39,9 +43,7 @@ export default function BooksPage() {
     }
     load();
     return () => { active = false; };
-  }, [page]);
-
-  const pageSize = books.length || 0;
+  }, [page, pageSize]);
 
   return (
     <div className="space-y-6 w-full">
@@ -101,7 +103,7 @@ export default function BooksPage() {
       <SlidingPagination
         page={page}
         totalCount={pager?.count}
-        pageSize={pageSize}
+        pageSize={pageSize || books.length || 0}
         loading={loading}
         onChange={setPage}
         windowSize={5}
