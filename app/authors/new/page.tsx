@@ -1,15 +1,15 @@
 "use client";
 
 // Shadcn UI (run: npx shadcn add form input textarea button card alert)
-// @ts-ignore
+// @ts-expect-error
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-// @ts-ignore
+// @ts-expect-error
 import { Input } from "@/components/ui/input";
-// @ts-ignore
+// @ts-expect-error
 import { Button } from "@/components/ui/button";
-// @ts-ignore
+// @ts-expect-error
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
-// @ts-ignore
+// @ts-expect-error
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
 import { useRouter } from "next/navigation";

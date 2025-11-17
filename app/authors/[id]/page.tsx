@@ -1,17 +1,17 @@
 "use client";
 
 // Shadcn UI imports (run: npx shadcn add card form input button alert skeleton)
-// @ts-ignore
+// @ts-expect-error
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
-// @ts-ignore
+// @ts-expect-error
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-// @ts-ignore
+// @ts-expect-error
 import { Input } from "@/components/ui/input";
-// @ts-ignore
+// @ts-expect-error
 import { Button } from "@/components/ui/button";
-// @ts-ignore
+// @ts-expect-error
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-// @ts-ignore
+// @ts-expect-error
 import { Skeleton } from "@/components/ui/skeleton";
 
 import { useEffect, useState } from "react";

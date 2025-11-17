@@ -1,17 +1,13 @@
+// @ts-ignore
+
 "use client";
 
 // Shadcn UI placeholders (run: npx shadcn add form input select button card alert)
-// @ts-ignore
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-// @ts-ignore
 import { Input } from "@/components/ui/input";
-// @ts-ignore
 import { Button } from "@/components/ui/button";
-// @ts-ignore
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
-// @ts-ignore
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-// @ts-ignore
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 
 import { useRouter } from "next/navigation";
