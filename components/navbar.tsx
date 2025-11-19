@@ -15,7 +15,7 @@ export function Navbar() {
     router.push("/login");
   };
 
-  const hideActions = pathname === "/login"; // hide nav actions on login page per requirement
+  const hideActions = pathname === "/login" || pathname === "/sign-up"; // hide nav actions on login page per requirement
 
   return (
     <nav className="w-full border-b bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60 sticky top-0 z-40">

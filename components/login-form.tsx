@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { useState } from "react"
+import Link from "next/link";
 
 type LoginFormProps = Omit<React.ComponentProps<"div">, "onSubmit"> & {
   onSubmit?: (data: { email: string; password: string }) => void | Promise<void>
@@ -74,7 +75,10 @@ export function LoginForm({
               </Field>
 
               <FieldDescription className="text-center">
-                Don&apos;t have an account? <a href="#">Sign up</a>
+                Don&apos;t have an account?{" "}
+                <Link href="/sign-up" className="underline-offset-4 hover:underline">
+                  Sign up
+                </Link>
               </FieldDescription>
             </FieldGroup>
           </form>

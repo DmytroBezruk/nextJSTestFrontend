@@ -29,7 +29,7 @@ export default function RootLayout({
     const pathname = usePathname();
 
     // You can define conditions per route:
-    const mainPadding = pathname === "/login" ? "py-0 px-16" : "py-32 px-16";
+    const mainPadding = pathname === "/login" || "/sign-up" ? "py-0 px-16" : "py-32 px-16";
     return (
         <html lang="en">
         <body

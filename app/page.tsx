@@ -38,7 +38,7 @@ export default function DashboardPage() {
   const maxAuthors = Math.max(1, ...(data?.buckets.map(b => b.authors) || [1]));
 
   return (
-    <div className="space-y-8" role="main">
+    <div className="space-y-8 w-full" role="main">
       <div className="space-y-1">
         <h1 className="text-3xl font-semibold tracking-tight">Dashboard</h1>
         <p className="text-sm text-muted-foreground">Overview of your catalog performance.</p>
