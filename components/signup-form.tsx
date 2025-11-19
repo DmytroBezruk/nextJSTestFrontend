@@ -10,16 +10,21 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { useState } from "react"
+import Image from 'next/image'
+
+type SignupFormData = { name: string; email: string; password: string }
 
 type SignupFormProps = Omit<React.ComponentProps<"div">, "onSubmit"> & {
-  onSubmit?: (data: { email: string; password: string }) => void | Promise<void>
+  onSubmit?: (data: SignupFormData) => void | Promise<void>
   sideImage?: string // optional custom image
+  serverError?: string // optional error passed from parent
 }
 
 export function SignupForm({
   className,
   onSubmit,
   sideImage = "/placeholder.svg",
+  serverError,
   ...props
 }: SignupFormProps) {
   const [loading, setLoading] = useState(false)
@@ -30,10 +35,15 @@ export function SignupForm({
     setError("")
 
     const form = e.target as HTMLFormElement
-    const email = (form.elements.namedItem("email") as HTMLInputElement).value
+    const name = (form.elements.namedItem("name") as HTMLInputElement).value.trim()
+    const email = (form.elements.namedItem("email") as HTMLInputElement).value.trim()
     const password = (form.elements.namedItem("password") as HTMLInputElement).value
     const confirmPassword = (form.elements.namedItem("confirm-password") as HTMLInputElement).value
 
+    if (!name) {
+      setError("Name is required")
+      return
+    }
     if (password !== confirmPassword) {
       setError("Passwords do not match")
       return
@@ -41,7 +51,12 @@ export function SignupForm({
 
     if (onSubmit) {
       setLoading(true)
-      Promise.resolve(onSubmit({ email, password })).finally(() => setLoading(false))
+      Promise.resolve(onSubmit({ name, email, password }))
+        .catch((err: any) => {
+          const msg = err?.message || 'Registration failed'
+          setError(msg)
+        })
+        .finally(() => setLoading(false))
     }
   }
 
@@ -56,9 +71,14 @@ export function SignupForm({
               <div className="flex flex-col items-center gap-2 text-center">
                 <h1 className="text-2xl font-bold">Create your account</h1>
                 <p className="text-muted-foreground text-balance text-sm">
-                  Enter your email and password
+                  Fill in your details to get started
                 </p>
               </div>
+
+              <Field>
+                <FieldLabel htmlFor="name">Name</FieldLabel>
+                <Input id="name" type="text" placeholder="John Doe" required />
+              </Field>
 
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
@@ -80,8 +100,8 @@ export function SignupForm({
                 <Input id="confirm-password" type="password" required />
               </Field>
 
-              {error && (
-                <p className="text-destructive text-sm text-center">{error}</p>
+              {(error || serverError) && (
+                <p className="text-destructive text-sm text-center">{error || serverError}</p>
               )}
 
               <Field>
@@ -101,10 +121,12 @@ export function SignupForm({
 
           {/* IMAGE SECTION */}
           <div className="relative hidden md:block bg-muted">
-            <img
+            <Image
               src={sideImage}
               alt="Side illustration"
-              className="absolute inset-0 h-full w-full object-contain dark:brightness-[0.2] dark:grayscale"
+              fill
+              className="absolute inset-0 object-contain dark:brightness-[0.2] dark:grayscale"
+              priority
             />
           </div>
 
