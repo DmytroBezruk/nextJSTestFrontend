@@ -1,12 +1,6 @@
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import {
   Field,
   FieldDescription,
@@ -18,9 +12,15 @@ import { useState } from "react"
 
 type LoginFormProps = Omit<React.ComponentProps<"div">, "onSubmit"> & {
   onSubmit?: (data: { email: string; password: string }) => void | Promise<void>
+  sideImage?: string // optional custom image
 }
 
-export function LoginForm({className, onSubmit, ...props}: LoginFormProps) {
+export function LoginForm({
+  className,
+  onSubmit,
+  sideImage = "/placeholder.svg",
+  ...props
+}: LoginFormProps) {
   const [loading, setLoading] = useState(false)
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -39,16 +39,19 @@ export function LoginForm({className, onSubmit, ...props}: LoginFormProps) {
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card>
-        <CardHeader>
-          <CardTitle>Login to your account</CardTitle>
-          <CardDescription>
-            Enter your email below to login to your account
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit}>
+      <Card className="overflow-hidden p-0">
+        <CardContent className="grid p-0 md:grid-cols-2">
+
+          {/* FORM SECTION */}
+          <form onSubmit={handleSubmit} className="p-6 md:p-8">
             <FieldGroup>
+              <div className="flex flex-col items-center gap-2 text-center">
+                <h1 className="text-2xl font-bold">Welcome back</h1>
+                <p className="text-muted-foreground text-balance">
+                  Login to your account
+                </p>
+              </div>
+
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
@@ -58,29 +61,33 @@ export function LoginForm({className, onSubmit, ...props}: LoginFormProps) {
                   required
                 />
               </Field>
+
               <Field>
-                <div className="flex items-center">
-                  <FieldLabel htmlFor="password">Password</FieldLabel>
-                  <a
-                    href="#"
-                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                  >
-                    Forgot your password?
-                  </a>
-                </div>
+                <FieldLabel htmlFor="password">Password</FieldLabel>
                 <Input id="password" type="password" required />
               </Field>
+
               <Field>
-                <Button type="submit" disabled={loading}>{loading ? "Logging in…" : "Login"}</Button>
-                {/*<Button variant="outline" type="button">*/}
-                {/*  Login with Google*/}
-                {/*</Button>*/}
-                <FieldDescription className="text-center">
-                  Don&apos;t have an account? <a href="#">Sign up</a>
-                </FieldDescription>
+                <Button type="submit" disabled={loading}>
+                  {loading ? "Logging in…" : "Login"}
+                </Button>
               </Field>
+
+              <FieldDescription className="text-center">
+                Don&apos;t have an account? <a href="#">Sign up</a>
+              </FieldDescription>
             </FieldGroup>
           </form>
+
+          {/* IMAGE SECTION */}
+          <div className="relative hidden md:block bg-muted">
+            <img
+              src={sideImage}
+              alt="Side illustration"
+              className="absolute inset-0 h-full w-full object-contain dark:brightness-[0.2] dark:grayscale"
+            />
+          </div>
+
         </CardContent>
       </Card>
     </div>
