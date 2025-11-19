@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { SlidingPagination } from "@/components/sliding-pagination";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { fetchAuthors } from "@/lib/data";
 import { Author, PaginatedAuthorList } from "@/lib/types";
@@ -78,7 +79,17 @@ export default function AuthorsPage() {
             <Link key={author.id} href={`/authors/${author.id}`} className="group">
               <Card className="overflow-hidden flex flex-col transition-shadow group-hover:shadow-sm">
                 <div className="relative h-40 w-full flex items-center justify-center bg-gradient-to-br from-indigo-50 to-indigo-100">
-                  <User className="h-16 w-16 text-indigo-400 group-hover:scale-105 transition-transform" strokeWidth={1.2} />
+                  {author.image_url ? (
+                    <Image
+                      src={author.image_url}
+                      alt={author.name}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    />
+                  ) : (
+                    <User className="h-16 w-16 text-indigo-400 group-hover:scale-105 transition-transform" strokeWidth={1.2} />
+                  )}
                 </div>
                 <CardHeader className="py-3">
                   <CardTitle className="text-base line-clamp-2 group-hover:text-indigo-700 transition-colors">{author.name}</CardTitle>

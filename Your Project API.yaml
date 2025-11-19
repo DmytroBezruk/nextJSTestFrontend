@@ -67,19 +67,20 @@ paths:
           description: ''
     post:
       operationId: authors_create
+      description: Create an author (multipart/form-data with optional image)
       tags:
       - authors
       requestBody:
         content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Author'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Author'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/Author'
+              $ref: '#/components/schemas/AuthorCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AuthorCreateRequest'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthorCreateRequest'
         required: true
       security:
       - jwtAuth: []
@@ -113,6 +114,7 @@ paths:
           description: ''
     put:
       operationId: authors_update
+      description: Update an author (multipart/form-data with optional image)
       parameters:
       - in: path
         name: id
@@ -124,15 +126,15 @@ paths:
       - authors
       requestBody:
         content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Author'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Author'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/Author'
+              $ref: '#/components/schemas/AuthorCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AuthorCreateRequest'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthorCreateRequest'
         required: true
       security:
       - jwtAuth: []
@@ -145,6 +147,7 @@ paths:
           description: ''
     patch:
       operationId: authors_partial_update
+      description: Partially update an author (multipart/form-data with optional image)
       parameters:
       - in: path
         name: id
@@ -156,15 +159,15 @@ paths:
       - authors
       requestBody:
         content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PatchedAuthor'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/PatchedAuthor'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PatchedAuthor'
+              $ref: '#/components/schemas/PatchedAuthorCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedAuthorCreateRequest'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedAuthorCreateRequest'
       security:
       - jwtAuth: []
       responses:
@@ -190,6 +193,23 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/authors/all/:
+    get:
+      operationId: authors_all_list
+      description: Return all authors without pagination.
+      tags:
+      - authors
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Author'
+          description: ''
   /api/books/:
     get:
       operationId: books_list
@@ -213,19 +233,20 @@ paths:
           description: ''
     post:
       operationId: books_create
+      description: Create a book (multipart/form-data, include image and author_id).
       tags:
       - books
       requestBody:
         content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Book'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Book'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/Book'
+              $ref: '#/components/schemas/BookCreateUpdateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BookCreateUpdateRequest'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookCreateUpdateRequest'
         required: true
       security:
       - jwtAuth: []
@@ -259,6 +280,7 @@ paths:
           description: ''
     put:
       operationId: books_update
+      description: Update a book (multipart/form-data, include image and author_id).
       parameters:
       - in: path
         name: id
@@ -270,15 +292,15 @@ paths:
       - books
       requestBody:
         content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Book'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Book'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/Book'
+              $ref: '#/components/schemas/BookCreateUpdateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BookCreateUpdateRequest'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookCreateUpdateRequest'
         required: true
       security:
       - jwtAuth: []
@@ -291,6 +313,7 @@ paths:
           description: ''
     patch:
       operationId: books_partial_update
+      description: Partially update a book (multipart/form-data).
       parameters:
       - in: path
         name: id
@@ -302,15 +325,15 @@ paths:
       - books
       requestBody:
         content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PatchedBook'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/PatchedBook'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PatchedBook'
+              $ref: '#/components/schemas/PatchedBookCreateUpdateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedBookCreateUpdateRequest'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedBookCreateUpdateRequest'
       security:
       - jwtAuth: []
       responses:
@@ -345,13 +368,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ChangePassword'
+              $ref: '#/components/schemas/ChangePasswordRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/ChangePassword'
+              $ref: '#/components/schemas/ChangePasswordRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/ChangePassword'
+              $ref: '#/components/schemas/ChangePasswordRequest'
         required: true
       security:
       - jwtAuth: []
@@ -370,13 +393,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchedChangePassword'
+              $ref: '#/components/schemas/PatchedChangePasswordRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/PatchedChangePassword'
+              $ref: '#/components/schemas/PatchedChangePasswordRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PatchedChangePassword'
+              $ref: '#/components/schemas/PatchedChangePasswordRequest'
       security:
       - jwtAuth: []
       responses:
@@ -398,21 +421,17 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MyTokenObtainPair'
+              $ref: '#/components/schemas/MyTokenObtainPairRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/MyTokenObtainPair'
+              $ref: '#/components/schemas/MyTokenObtainPairRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/MyTokenObtainPair'
+              $ref: '#/components/schemas/MyTokenObtainPairRequest'
         required: true
       responses:
         '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/MyTokenObtainPair'
-          description: ''
+          description: No response body
   /api/logout/:
     post:
       operationId: logout_create
@@ -447,13 +466,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserProfile'
+              $ref: '#/components/schemas/UserProfileRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/UserProfile'
+              $ref: '#/components/schemas/UserProfileRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/UserProfile'
+              $ref: '#/components/schemas/UserProfileRequest'
         required: true
       security:
       - jwtAuth: []
@@ -472,13 +491,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchedUserProfile'
+              $ref: '#/components/schemas/PatchedUserProfileRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/PatchedUserProfile'
+              $ref: '#/components/schemas/PatchedUserProfileRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PatchedUserProfile'
+              $ref: '#/components/schemas/PatchedUserProfileRequest'
       security:
       - jwtAuth: []
       responses:
@@ -497,13 +516,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: '#/components/schemas/UserRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: '#/components/schemas/UserRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: '#/components/schemas/UserRequest'
         required: true
       security:
       - jwtAuth: []
@@ -527,13 +546,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TokenObtainPair'
+              $ref: '#/components/schemas/TokenObtainPairRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/TokenObtainPair'
+              $ref: '#/components/schemas/TokenObtainPairRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/TokenObtainPair'
+              $ref: '#/components/schemas/TokenObtainPairRequest'
         required: true
       responses:
         '200':
@@ -554,13 +573,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TokenRefresh'
+              $ref: '#/components/schemas/TokenRefreshRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/TokenRefresh'
+              $ref: '#/components/schemas/TokenRefreshRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/TokenRefresh'
+              $ref: '#/components/schemas/TokenRefreshRequest'
         required: true
       responses:
         '200':
@@ -611,6 +630,13 @@ components:
           maxLength: 255
         details:
           type: string
+        image:
+          type: string
+          format: binary
+          readOnly: true
+        image_url:
+          type: string
+          readOnly: true
         created_at:
           type: string
           format: date-time
@@ -622,8 +648,28 @@ components:
       required:
       - created_at
       - id
+      - image
+      - image_url
       - name
       - updated_at
+    AuthorCreateRequest:
+      type: object
+      description: |-
+        Serializer for creating/updating Author instances including image upload.
+        Use this for request bodies (multipart/form-data) while responding with AuthorSerializer.
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        details:
+          type: string
+        image:
+          type: string
+          format: binary
+          nullable: true
+      required:
+      - name
     Book:
       type: object
       properties:
@@ -635,13 +681,17 @@ components:
           maxLength: 255
         content:
           type: string
+        image:
+          type: string
+          format: binary
+          nullable: true
+        image_url:
+          type: string
+          readOnly: true
         author:
           allOf:
           - $ref: '#/components/schemas/Author'
           readOnly: true
-        author_id:
-          type: integer
-          writeOnly: true
         created_at:
           type: string
           format: date-time
@@ -652,11 +702,31 @@ components:
           readOnly: true
       required:
       - author
-      - author_id
       - created_at
       - id
+      - image_url
       - name
       - updated_at
+    BookCreateUpdateRequest:
+      type: object
+      description: Serializer used for create/update operations with multipart form
+        including image.
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        content:
+          type: string
+        image:
+          type: string
+          format: binary
+          nullable: true
+        author_id:
+          type: integer
+      required:
+      - author_id
+      - name
     ChangePassword:
       type: object
       properties:
@@ -664,6 +734,18 @@ components:
           type: string
         new_password:
           type: string
+      required:
+      - new_password
+      - old_password
+    ChangePasswordRequest:
+      type: object
+      properties:
+        old_password:
+          type: string
+          minLength: 1
+        new_password:
+          type: string
+          minLength: 1
       required:
       - new_password
       - old_password
@@ -680,15 +762,17 @@ components:
       - authors
       - books
       - label
-    MyTokenObtainPair:
+    MyTokenObtainPairRequest:
       type: object
       properties:
         email:
           type: string
           writeOnly: true
+          minLength: 1
         password:
           type: string
           writeOnly: true
+          minLength: 1
       required:
       - email
       - password
@@ -738,78 +822,59 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Book'
-    PatchedAuthor:
+    PatchedAuthorCreateRequest:
       type: object
+      description: |-
+        Serializer for creating/updating Author instances including image upload.
+        Use this for request bodies (multipart/form-data) while responding with AuthorSerializer.
       properties:
-        id:
-          type: integer
-          readOnly: true
         name:
           type: string
+          minLength: 1
           maxLength: 255
         details:
           type: string
-        created_at:
+        image:
           type: string
-          format: date-time
-          readOnly: true
-        updated_at:
-          type: string
-          format: date-time
-          readOnly: true
-    PatchedBook:
+          format: binary
+          nullable: true
+    PatchedBookCreateUpdateRequest:
       type: object
+      description: Serializer used for create/update operations with multipart form
+        including image.
       properties:
-        id:
-          type: integer
-          readOnly: true
         name:
           type: string
+          minLength: 1
           maxLength: 255
         content:
           type: string
-        author:
-          allOf:
-          - $ref: '#/components/schemas/Author'
-          readOnly: true
+        image:
+          type: string
+          format: binary
+          nullable: true
         author_id:
           type: integer
-          writeOnly: true
-        created_at:
-          type: string
-          format: date-time
-          readOnly: true
-        updated_at:
-          type: string
-          format: date-time
-          readOnly: true
-    PatchedChangePassword:
+    PatchedChangePasswordRequest:
       type: object
       properties:
         old_password:
           type: string
+          minLength: 1
         new_password:
           type: string
-    PatchedUserProfile:
+          minLength: 1
+    PatchedUserProfileRequest:
       type: object
       properties:
-        email:
-          type: string
-          format: email
-          readOnly: true
         name:
           type: string
+          minLength: 1
           title: Full name
           maxLength: 255
     TokenObtainPair:
       type: object
       properties:
-        email:
-          type: string
-          writeOnly: true
-        password:
-          type: string
-          writeOnly: true
         access:
           type: string
           readOnly: true
@@ -818,20 +883,37 @@ components:
           readOnly: true
       required:
       - access
+      - refresh
+    TokenObtainPairRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          writeOnly: true
+          minLength: 1
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
       - email
       - password
-      - refresh
     TokenRefresh:
       type: object
       properties:
         access:
           type: string
           readOnly: true
+      required:
+      - access
+    TokenRefreshRequest:
+      type: object
+      properties:
         refresh:
           type: string
           writeOnly: true
+          minLength: 1
       required:
-      - access
       - refresh
     User:
       type: object
@@ -843,11 +925,6 @@ components:
           type: string
           title: Full name
           maxLength: 255
-        password:
-          type: string
-          writeOnly: true
-          maxLength: 20
-          minLength: 9
         email:
           type: string
           format: email
@@ -856,7 +933,6 @@ components:
       - email
       - id
       - name
-      - password
     UserProfile:
       type: object
       properties:
@@ -871,6 +947,38 @@ components:
       required:
       - email
       - name
+    UserProfileRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          title: Full name
+          maxLength: 255
+      required:
+      - name
+    UserRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          title: Full name
+          maxLength: 255
+        password:
+          type: string
+          writeOnly: true
+          minLength: 9
+          maxLength: 20
+        email:
+          type: string
+          format: email
+          minLength: 1
+          maxLength: 255
+      required:
+      - email
+      - name
+      - password
   securitySchemes:
     jwtAuth:
       type: http

@@ -1,5 +1,3 @@
-// @ts-ignore
-
 "use client";
 
 // Shadcn UI placeholders (run: npx shadcn add form input select button card alert)
@@ -22,6 +20,7 @@ const BookSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   content: z.string().min(1, "Content is required"),
   author_id: z.string().min(1, "Author is required"), // will convert to number
+  image: z.custom<File | undefined>((val) => val === undefined || val instanceof File, { message: 'Invalid file' }).optional(),
 });
 
 type BookValues = z.infer<typeof BookSchema>;
@@ -63,10 +62,11 @@ export default function NewBookPage() {
     setError(null);
     setSubmitting(true);
     try {
-      await createBook({ name: values.name, content: values.content, author_id: Number(values.author_id) });
+      await createBook({ name: values.name, content: values.content, author_id: Number(values.author_id), image: values.image || null });
       router.push('/books');
-    } catch (err: any) {
-      setError(err?.message || 'Failed to create book');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to create book';
+      setError(message);
     } finally {
       setSubmitting(false);
     }
@@ -140,6 +140,26 @@ export default function NewBookPage() {
                   </FormItem>
                 )}
               />
+              <FormField
+                control={form.control}
+                name="image"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Image</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          field.onChange(file || undefined);
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               {error && (
                 <Alert variant="destructive">
                   <AlertTitle>Error</AlertTitle>
@@ -157,4 +177,3 @@ export default function NewBookPage() {
     </div>
   );
 }
-

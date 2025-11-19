@@ -1,20 +1,13 @@
 "use client";
 
 // Shadcn UI placeholders (run: npx shadcn add card form input select button alert skeleton)
-// @ts-expect-error
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
-// @ts-expect-error
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-// @ts-expect-error
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-// @ts-expect-error
 import { Button } from "@/components/ui/button";
-// @ts-expect-error
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-// @ts-expect-error
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
-// @ts-expect-error
 import { Skeleton } from "@/components/ui/skeleton";
 
 import { useEffect, useState } from "react";
@@ -24,11 +17,13 @@ import { Book, Author } from "@/lib/types";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Image from "next/image";
 
 const BookEditSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   content: z.string().min(1, "Content is required"),
   author_id: z.string().min(1, "Author is required"),
+  image: z.custom<File | undefined>((val) => val === undefined || val instanceof File, { message: 'Invalid file' }).optional(),
 });
 
 type BookEditValues = z.infer<typeof BookEditSchema>;
@@ -58,14 +53,23 @@ export default function BookDetailPage() {
       try {
         setLoading(true);
         const data = await fetchBook(id);
-        const authorsData = await fetchAllAuthors();
         if (!active) return;
         setBook(data);
-        setAuthors(authorsData);
+        // Fetch authors separately so we can surface its errors independently
+        try {
+          const authorsData = await fetchAllAuthors();
+          if (active) setAuthors(authorsData);
+        } catch (aErr) {
+          if (active) {
+            const msg = aErr instanceof Error ? aErr.message : 'Failed to load authors';
+            setAuthorsError(msg);
+          }
+        }
         form.reset({ name: data.name, content: data.content, author_id: String(data.author?.id || data.author_id) });
-      } catch (err: any) {
+      } catch (err) {
         if (!active) return;
-        setError(err?.message || "Failed to load book");
+        const message = err instanceof Error ? err.message : 'Failed to load book';
+        setError(message);
       } finally {
         if (active) setLoading(false);
         if (active) setAuthorsLoading(false);
@@ -79,10 +83,11 @@ export default function BookDetailPage() {
     setError(null);
     setSaving(true);
     try {
-      await updateBook(id, { name: values.name, content: values.content, author_id: Number(values.author_id) });
+      await updateBook(id, { name: values.name, content: values.content, author_id: Number(values.author_id), image: values.image || null });
       router.push('/books');
-    } catch (err: any) {
-      setError(err?.message || 'Failed to update book');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to update book';
+      setError(message);
     } finally {
       setSaving(false);
     }
@@ -95,8 +100,9 @@ export default function BookDetailPage() {
     try {
       await deleteBook(id);
       router.push('/books');
-    } catch (err: any) {
-      setError(err?.message || 'Failed to delete book');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to delete book';
+      setError(message);
     } finally {
       setDeleting(false);
     }
@@ -198,6 +204,31 @@ export default function BookDetailPage() {
                   </FormItem>
                 )}
               />
+              {book.image_url && (
+                <div className="rounded-md overflow-hidden border bg-muted p-1">
+                  <Image src={book.image_url} alt={book.name} width={100} height={100} className="object-cover w-full h-full" />
+                </div>
+              )}
+              <FormField
+                control={form.control}
+                name="image"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Replace Image</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          field.onChange(file || undefined);
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               {error && (
                 <Alert variant="destructive">
                   <AlertTitle>Error</AlertTitle>
@@ -215,4 +246,3 @@ export default function BookDetailPage() {
     </div>
   );
 }
-

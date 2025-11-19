@@ -1,15 +1,10 @@
 "use client";
 
 // Shadcn UI (run: npx shadcn add form input textarea button card alert)
-// @ts-expect-error
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-// @ts-expect-error
 import { Input } from "@/components/ui/input";
-// @ts-expect-error
 import { Button } from "@/components/ui/button";
-// @ts-expect-error
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
-// @ts-expect-error
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
 import { useRouter } from "next/navigation";
@@ -22,6 +17,7 @@ import { createAuthor } from "@/lib/data";
 const AuthorSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   details: z.string().optional(),
+  image: z.custom<File | undefined>((val) => val === undefined || val instanceof File, { message: 'Invalid file' }).optional(),
 });
 
 type AuthorValues = z.infer<typeof AuthorSchema>;
@@ -40,10 +36,11 @@ export default function NewAuthorPage() {
     setError(null);
     setSubmitting(true);
     try {
-      await createAuthor({ name: values.name, details: values.details });
+      await createAuthor({ name: values.name, details: values.details, image: values.image || null });
       router.push("/authors");
-    } catch (err: any) {
-      setError(err?.message || "Failed to create author");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to create author';
+      setError(message);
     } finally {
       setSubmitting(false);
     }
@@ -89,6 +86,26 @@ export default function NewAuthorPage() {
                   </FormItem>
                 )}
               />
+              <FormField
+                control={form.control}
+                name="image"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Image</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          field.onChange(file || undefined);
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               {error && (
                 <Alert variant="destructive">
                   <AlertTitle>Error</AlertTitle>
@@ -106,4 +123,3 @@ export default function NewAuthorPage() {
     </div>
   );
 }
-

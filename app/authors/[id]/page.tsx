@@ -1,17 +1,11 @@
 "use client";
 
 // Shadcn UI imports (run: npx shadcn add card form input button alert skeleton)
-// @ts-expect-error
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
-// @ts-expect-error
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-// @ts-expect-error
 import { Input } from "@/components/ui/input";
-// @ts-expect-error
 import { Button } from "@/components/ui/button";
-// @ts-expect-error
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-// @ts-expect-error
 import { Skeleton } from "@/components/ui/skeleton";
 
 import { useEffect, useState } from "react";
@@ -21,10 +15,12 @@ import { Author } from "@/lib/types";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Image from "next/image";
 
 const AuthorEditSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   details: z.string().optional(),
+  image: z.custom<File | undefined>((val) => val === undefined || val instanceof File, { message: 'Invalid file' }).optional(),
 });
 
 type AuthorEditValues = z.infer<typeof AuthorEditSchema>;
@@ -54,9 +50,10 @@ export default function AuthorDetailPage() {
         if (!active) return;
         setAuthor(data);
         form.reset({ name: data.name, details: data.details || "" });
-      } catch (err: any) {
+      } catch (err) {
         if (!active) return;
-        setError(err?.message || "Failed to load author");
+        const message = err instanceof Error ? err.message : 'Failed to load author';
+        setError(message);
       } finally {
         if (active) setLoading(false);
       }
@@ -69,10 +66,11 @@ export default function AuthorDetailPage() {
     setError(null);
     setSaving(true);
     try {
-      await updateAuthor(id, { name: values.name, details: values.details });
+      await updateAuthor(id, { name: values.name, details: values.details, image: values.image || null });
       router.push('/authors');
-    } catch (err: any) {
-      setError(err?.message || 'Failed to update author');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to update author';
+      setError(message);
     } finally {
       setSaving(false);
     }
@@ -85,8 +83,7 @@ export default function AuthorDetailPage() {
     try {
       await deleteAuthor(id);
       router.push('/authors');
-    } catch (err: any) {
-      setError(err?.message || 'Failed to delete author');
+    } catch (err) {
     } finally {
       setDeleting(false);
     }
@@ -160,6 +157,31 @@ export default function AuthorDetailPage() {
                   </FormItem>
                 )}
               />
+              {author.image_url && (
+                <div className="rounded-md overflow-hidden border bg-muted p-1">
+                  <Image src={author.image_url} alt={author.name} width={100} height={100} className="object-cover w-full h-full" />
+                </div>
+              )}
+              <FormField
+                control={form.control}
+                name="image"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Replace Image</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          field.onChange(file || undefined);
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               {error && (
                 <Alert variant="destructive">
                   <AlertTitle>Error</AlertTitle>
@@ -177,4 +199,3 @@ export default function AuthorDetailPage() {
     </div>
   );
 }
-

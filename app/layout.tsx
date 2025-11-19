@@ -35,10 +35,9 @@ export default function RootLayout({
         <body
             className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <Navbar/>
-        <div
-            className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
+        <div className="flex min-h-screen items-center justify-center bg-zinc-100 font-sans dark:bg-black">
             <main
-                className={`flex min-h-screen w-full max-w-3xl flex-col items-center justify-between ${mainPadding} bg-white dark:bg-black sm:items-start align-items-center`}>
+                className={`flex min-h-screen w-full max-w-6xl flex-col items-center justify-between ${mainPadding} bg-white dark:bg-black sm:items-start align-items-center`}>
                 {children}
             </main>
         </div>

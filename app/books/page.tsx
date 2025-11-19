@@ -78,13 +78,23 @@ export default function BooksPage() {
             <Link key={book.id} href={`/books/${book.id}`} className="group">
               <Card className="overflow-hidden flex flex-col transition-shadow group-hover:shadow-sm">
                 <div className="relative h-40 w-full bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center">
-                  <Image
-                    src="/window.svg"
-                    alt={book.name}
-                    width={80}
-                    height={80}
-                    className="opacity-80 group-hover:scale-105 transition-transform"
-                  />
+                  {book.image_url ? (
+                    <Image
+                      src={book.image_url}
+                      alt={book.name}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    />
+                  ) : (
+                    <Image
+                      src="/window.svg"
+                      alt={book.name}
+                      width={80}
+                      height={80}
+                      className="opacity-80 group-hover:scale-105 transition-transform"
+                    />
+                  )}
                 </div>
                 <CardHeader className="py-3">
                   <CardTitle className="text-base line-clamp-2 group-hover:text-blue-700 transition-colors">{book.name}</CardTitle>
