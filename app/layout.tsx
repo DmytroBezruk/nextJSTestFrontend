@@ -5,6 +5,9 @@ import { usePathname } from 'next/navigation'
 import {Geist, Geist_Mono} from "next/font/google";
 import "./globals.css";
 import {Navbar} from "@/components/navbar";
+import { Provider } from 'react-redux';
+import { store } from '@/lib/store';
+import { NotificationToaster } from '@/components/notification-toaster';
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -34,13 +37,16 @@ export default function RootLayout({
         <html lang="en">
         <body
             className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <Provider store={store}>
         <Navbar/>
+        <NotificationToaster />
         <div className="flex min-h-screen items-center justify-center bg-zinc-100 font-sans dark:bg-black">
             <main
                 className={`flex min-h-screen w-full max-w-6xl flex-col items-center justify-between ${mainPadding} bg-white dark:bg-black sm:items-start align-items-center`}>
                 {children}
             </main>
         </div>
+        </Provider>
         </body>
         </html>
     );

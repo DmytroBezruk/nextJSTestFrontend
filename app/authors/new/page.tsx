@@ -13,6 +13,8 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createAuthor } from "@/lib/data";
+import { useAppDispatch } from '@/lib/hooks';
+import { pushNotification } from '@/lib/store/notificationsSlice';
 
 const AuthorSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -24,6 +26,7 @@ type AuthorValues = z.infer<typeof AuthorSchema>;
 
 export default function NewAuthorPage() {
   const router = useRouter();
+  const dispatch = useAppDispatch();
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -37,10 +40,12 @@ export default function NewAuthorPage() {
     setSubmitting(true);
     try {
       await createAuthor({ name: values.name, details: values.details, image: values.image || null });
+      dispatch(pushNotification(`Author "${values.name}" created successfully`, 'success'));
       router.push("/authors");
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to create author';
       setError(message);
+      dispatch(pushNotification(message, 'error'));
     } finally {
       setSubmitting(false);
     }

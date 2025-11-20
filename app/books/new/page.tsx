@@ -14,6 +14,8 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createBook, fetchAllAuthors } from "@/lib/data";
+import { useAppDispatch } from '@/lib/hooks';
+import { pushNotification } from '@/lib/store/notificationsSlice';
 import { Author } from "@/lib/types";
 
 const BookSchema = z.object({
@@ -27,6 +29,7 @@ type BookValues = z.infer<typeof BookSchema>;
 
 export default function NewBookPage() {
   const router = useRouter();
+  const dispatch = useAppDispatch();
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [authors, setAuthors] = useState<Author[]>([]);
@@ -63,10 +66,12 @@ export default function NewBookPage() {
     setSubmitting(true);
     try {
       await createBook({ name: values.name, content: values.content, author_id: Number(values.author_id), image: values.image || null });
+      dispatch(pushNotification(`Book "${values.name}" created successfully`, 'success'));
       router.push('/books');
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to create book';
       setError(message);
+      dispatch(pushNotification(message, 'error'));
     } finally {
       setSubmitting(false);
     }
