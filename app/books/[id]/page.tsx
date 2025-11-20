@@ -21,7 +21,7 @@ import Image from "next/image";
 
 const BookEditSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
-  content: z.string().min(1, "Content is required"),
+  content: z.string().min(1, "Short Content is required"),
   author_id: z.string().min(1, "Author is required"),
   image: z.custom<File | undefined>((val) => val === undefined || val instanceof File, { message: 'Invalid file' }).optional(),
 });
@@ -168,7 +168,7 @@ export default function BookDetailPage() {
                 name="content"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Content</FormLabel>
+                    <FormLabel>Short Content</FormLabel>
                     <FormControl>
                       <Textarea placeholder="Short description" {...field} />
                     </FormControl>

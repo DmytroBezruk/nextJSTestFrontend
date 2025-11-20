@@ -43,7 +43,7 @@ export default function DashboardPage() {
     thresholds: [
       { value: 1, color: "#22c55e" }, // green
       { value: 2, color: "#3b82f6" }, // blue
-      { value: 3, color: "#ef4444" }, // red
+      { value: 3, color: "#ffc300" }, // gold
     ],
   });
 
