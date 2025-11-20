@@ -24,29 +24,44 @@ export function SlidingPagination({
   windowSize = 5,
   className = "justify-center",
 }: SlidingPaginationProps) {
-  // Derive maximum pages if we know totalCount & pageSize
-  const maxPages = totalCount !== undefined && pageSize ? Math.max(1, Math.ceil(totalCount / pageSize)) : undefined;
-  const internalHasNext = maxPages ? page < maxPages : Boolean(hasNext);
+  const maxPages = totalCount !== undefined && pageSize ? (totalCount === 0 ? 0 : Math.ceil(totalCount / pageSize)) : undefined;
+
+  // Hide pagination entirely when explicit empty dataset
+  if (totalCount !== undefined && totalCount === 0) return null;
+  if (maxPages === 0) return null;
+
+  const internalHasNext = maxPages !== undefined ? page < maxPages : Boolean(hasNext);
+
+  // If only one page (page 1 and no next), hide pagination.
+  if (page === 1 && !internalHasNext && (maxPages === undefined || maxPages === 1)) return null;
 
   const half = Math.floor(windowSize / 2);
-  const pages: number[] = [];
-  for (let i = 0; i < windowSize; i++) {
-    const pageNumber = page + i - half;
-    if (pageNumber >= 1) pages.push(pageNumber);
-  }
-  let uniquePages = Array.from(new Set(pages)).sort((a, b) => a - b);
-  if (maxPages) uniquePages = uniquePages.filter(p => p <= maxPages);
+  let uniquePages: number[] = [];
 
-  // If we're near the start, ensure window begins at 1
-  if (maxPages && page <= half) {
-    uniquePages = [];
-    for (let p = 1; p <= Math.min(windowSize, maxPages); p++) uniquePages.push(p);
-  }
-  // If near the end, adjust window to end at maxPages
-  if (maxPages && page > maxPages - half) {
-    uniquePages = [];
-    const start = Math.max(1, maxPages - windowSize + 1);
-    for (let p = start; p <= maxPages; p++) uniquePages.push(p);
+  if (maxPages !== undefined) {
+    // Build window respecting known maxPages
+    for (let i = 0; i < windowSize; i++) {
+      const pageNumber = page + i - half;
+      if (pageNumber >= 1 && pageNumber <= maxPages) uniquePages.push(pageNumber);
+    }
+    uniquePages = Array.from(new Set(uniquePages)).sort((a, b) => a - b);
+    if (page <= half) {
+      uniquePages = [];
+      for (let p = 1; p <= Math.min(windowSize, maxPages); p++) uniquePages.push(p);
+    }
+    if (page > maxPages - half) {
+      uniquePages = [];
+      const start = Math.max(1, maxPages - windowSize + 1);
+      for (let p = start; p <= maxPages; p++) uniquePages.push(p);
+    }
+  } else {
+    // Unknown max pages: show a centered window starting from 1 but avoid negative
+    for (let i = 0; i < windowSize; i++) {
+      const pageNumber = page + i - half;
+      if (pageNumber >= 1) uniquePages.push(pageNumber);
+    }
+    uniquePages = Array.from(new Set(uniquePages)).sort((a, b) => a - b);
+    // If we're at the very start (page 1) and no next page, we already early-returned above; if we have next we keep small window.
   }
 
   const disablePrev = page === 1 || loading;
